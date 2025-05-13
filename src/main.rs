@@ -11,8 +11,10 @@ fn main() {
 
     gs::Point::random(image.width, image.height).draw(&mut image);
 
-    // let rectangle = gs::Rectangle::new(&gs::Point::new(150, 150), &gs::Point::new(50, 50));
-    // rectangle.draw(&mut image);
+    let rec_point1 = gs::Point::new(150, 150);
+    let rec_point2 = gs::Point::new(50, 50);
+    let rectangle = gs::Rectangle::new(&rec_point1, &rec_point2);
+    rectangle.draw(&mut image);
 
     // let triangle = gs::Triangle::new (
     //         &gs::Point::new(500, 500),

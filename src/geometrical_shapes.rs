@@ -17,9 +17,11 @@ pub trait Drawable {
     }
 }
 
+// Point
+#[derive (Clone)]
 pub struct Point (i32, i32);
 impl Point {
-    fn new(x: i32, y: i32) -> Self {
+   pub fn new(x: i32, y: i32) -> Self {
         Self(x, y)
     }
 
@@ -37,6 +39,7 @@ impl Drawable for Point {
     }
 }
 
+// Line
 pub struct Line (Point, Point);
 impl Line {
     fn new(p1: Point, p2: Point) -> Self {
@@ -65,12 +68,63 @@ impl Drawable for Line {
 
         let mut x = self.0.0 as f64;
         let mut y = self.0.1 as f64;
-        let cl = self.color();
+        let cl = Color::white();
 
-        for _ in 0..step {
+        for _ in 0..=step {
             image.display(x.round() as i32, y.round() as i32, cl.clone());
             x += x_inc;
             y += y_inc;
         }
+    }
+}
+
+// Rectangle
+pub struct Rectangle<'a> (&'a Point, &'a Point);
+impl<'a> Rectangle<'a> {
+    pub fn new(p1: &'a Point, p2: &'a Point) -> Self {
+        Self(p1, p2)
+    }
+}
+
+impl<'a> Drawable for Rectangle<'a> {
+    fn draw(&self, image: &mut Image) {
+
+        // dda_line(
+        //     Point(self.0.0, self.0.1),
+        //     Point(self.1.0, self.0.1),
+        //     img,
+        //     &color,
+        // );
+        // dda_line(
+        //     Point(self.1.0, self.0.1),
+        //     Point(self.1.0, self.1.1),
+        //     img,
+        //     &color,
+        // );
+        // dda_line(
+        //     Point(self.1.0, self.1.1),
+        //     Point(self.0.0, self.1.1),
+        //     img,
+        //     &color,
+        // );
+        // dda_line(
+        //     Point(self.0.0, self.1.1),
+        //     Point(self.0.0, self.0.1),
+        //     img,
+        //     &color,
+        // );
+
+        let rb_point = Point::new(self.0.0, self.0.1);
+        let lt_point = Point::new(self.1.0, self.1.1);
+        let lb_point = Point::new(self.1.0, self.0.1);
+        let rt_point = Point::new(self.0.0, self.1.1);
+
+        Point::new(self.0.0, self.0.1).draw(image);
+        Point::new(self.1.0, self.1.1).draw(image);
+
+        Line::new(rb_point.clone(), lt_point.clone()).draw(image);
+        // Line::new(lb_point.clone(), rb_point.clone()).draw(image);
+        // Line::new(lb_point.clone(), lt_point.clone()).draw(image);
+        Line::new(lt_point.clone(), rt_point.clone()).draw(image);
     }
 }
