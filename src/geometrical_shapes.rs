@@ -79,19 +79,19 @@ impl Drawable for Line {
 }
 
 // Rectangle
-pub struct Rectangle<'a> (&'a Point, &'a Point);
-impl<'a> Rectangle<'a> {
-    pub fn new(p1: &'a Point, p2: &'a Point) -> Self {
-        Self(p1, p2)
+pub struct Rectangle ( Point, Point);
+impl Rectangle {
+    pub fn new(p1: &Point, p2: &Point) -> Self {
+        Self(p1.clone(), p2.clone())
     }
 }
 
-impl<'a> Drawable for Rectangle<'a> {
+impl Drawable for Rectangle {
     fn draw(&self, image: &mut Image) {
         let top_left = Point::new(self.0.0, self.1.1);
         let top_right = Point::new(self.1.0, self.1.1);
-        let bottom_left = Point::new(self.0.0, self.0.1*2);
-        let bottom_right = Point::new(self.1.0, self.0.1*2);
+        let bottom_left = Point::new(self.0.0, self.0.1);
+        let bottom_right = Point::new(self.1.0, self.0.1);
     
         Line::new(top_left.clone(), top_right.clone()).draw(image);
         Line::new(top_right.clone(), bottom_right.clone()).draw(image);
@@ -101,14 +101,14 @@ impl<'a> Drawable for Rectangle<'a> {
 }
 
 // Triangle
-pub struct Triangle<'a> (&'a Point, &'a Point, &'a Point);
-impl<'a> Triangle<'a> {
-    pub fn new(p1: &'a Point, p2: &'a Point, p3: &'a Point) -> Self {
-        Self(p1, p2, p3)
+pub struct Triangle (Point, Point, Point);
+impl Triangle {
+    pub fn new(p1: &Point, p2: &Point, p3: &Point) -> Self {
+        Self(p1.clone(), p2.clone(), p3.clone())
     }
 }
 
-impl<'a> Drawable for Triangle<'a> {
+impl Drawable for Triangle {
     fn draw(&self, image: &mut Image) {
         Line::new(self.0.clone(), self.1.clone()).draw(image);
         Line::new(self.1.clone(), self.2.clone()).draw(image);
@@ -132,7 +132,7 @@ impl Circle {
     pub fn random(width: i32, height: i32) -> Self {
         let x = rand::thread_rng().gen_range(0..=width);
         let y = rand::thread_rng().gen_range(0..=height);
-        let radius = rand::thread_rng().gen_range(1..=(width+height)/2);
+        let radius = rand::thread_rng().gen_range(1..=((width+height)/2)/2);
 
         Circle::new(Point::new(x, y), radius)
     }
@@ -145,7 +145,7 @@ impl Drawable for Circle {
         let radius = self.radius;
         let color = self.color();
         
-        let num_points = (radius * 8).max(360);
+        let num_points = radius * 360;
 
         for i in 0..num_points {
             let angle = (i as f64) * 2.0 * std::f64::consts::PI / (num_points as f64);
