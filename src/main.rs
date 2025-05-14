@@ -16,16 +16,19 @@ fn main() {
     let rectangle = gs::Rectangle::new(&rec_point1, &rec_point2);
     rectangle.draw(&mut image);
 
-    // let triangle = gs::Triangle::new (
-    //         &gs::Point::new(500, 500),
-    //         &gs::Point::new(250, 700),
-    //         &gs::Point::new(700, 800),
-    // );
-    // triangle.draw(&mut image);
+    let triangle_p1 = gs::Point::new(500, 500);
+    let triangle_p2 = gs::Point::new(250, 700);
+    let triangle_p3 = gs::Point::new(700, 800);
+    let triangle = gs::Triangle::new (
+            &triangle_p1,
+            &triangle_p2,
+            &triangle_p3,
+    );
+    triangle.draw(&mut image);
 
-    // for _ in 1..50 {
-    //     gs::Circle::random(image.width, image.height).draw(&mut image);
-    // }
+    for _ in 1..50 {
+        gs::Circle::random(image.width, image.height).draw(&mut image);
+    }
 
     raster::save(&image, "image.png").unwrap();
 }

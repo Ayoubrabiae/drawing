@@ -58,8 +58,8 @@ impl Line {
 
 impl Drawable for Line {
     fn draw(&self, image: &mut Image) {
-        let dx = self.0.0 - self.1.0;
-        let dy = self.0.1 - self.1.1;
+        let dx = self.1.0 - self.0.0;
+        let dy = self.1.1 - self.0.1;
 
         let step = dx.abs().max(dy.abs());
 
@@ -88,43 +88,73 @@ impl<'a> Rectangle<'a> {
 
 impl<'a> Drawable for Rectangle<'a> {
     fn draw(&self, image: &mut Image) {
+        let top_left = Point::new(self.0.0, self.1.1);
+        let top_right = Point::new(self.1.0, self.1.1);
+        let bottom_left = Point::new(self.0.0, self.0.1*2);
+        let bottom_right = Point::new(self.1.0, self.0.1*2);
+    
+        Line::new(top_left.clone(), top_right.clone()).draw(image);
+        Line::new(top_right.clone(), bottom_right.clone()).draw(image);
+        Line::new(bottom_right.clone(), bottom_left.clone()).draw(image);
+        Line::new(bottom_left.clone(), top_left.clone()).draw(image);
+    }
+}
 
-        // dda_line(
-        //     Point(self.0.0, self.0.1),
-        //     Point(self.1.0, self.0.1),
-        //     img,
-        //     &color,
-        // );
-        // dda_line(
-        //     Point(self.1.0, self.0.1),
-        //     Point(self.1.0, self.1.1),
-        //     img,
-        //     &color,
-        // );
-        // dda_line(
-        //     Point(self.1.0, self.1.1),
-        //     Point(self.0.0, self.1.1),
-        //     img,
-        //     &color,
-        // );
-        // dda_line(
-        //     Point(self.0.0, self.1.1),
-        //     Point(self.0.0, self.0.1),
-        //     img,
-        //     &color,
-        // );
+// Triangle
+pub struct Triangle<'a> (&'a Point, &'a Point, &'a Point);
+impl<'a> Triangle<'a> {
+    pub fn new(p1: &'a Point, p2: &'a Point, p3: &'a Point) -> Self {
+        Self(p1, p2, p3)
+    }
+}
 
-        let rb_point = Point::new(self.0.0, self.0.1);
-        let lt_point = Point::new(self.1.0, self.1.1);
-        let lb_point = Point::new(self.1.0, self.0.1);
-        let rt_point = Point::new(self.0.0, self.1.1);
+impl<'a> Drawable for Triangle<'a> {
+    fn draw(&self, image: &mut Image) {
+        Line::new(self.0.clone(), self.1.clone()).draw(image);
+        Line::new(self.1.clone(), self.2.clone()).draw(image);
+        Line::new(self.2.clone(), self.0.clone()).draw(image);
+    }
+}
 
-        Point::new(self.0.0, self.0.1).draw(image);
-        Point::new(self.1.0, self.1.1).draw(image);
+// Circle
+pub struct Circle {
+    point: Point,
+    radius: i32
+}
+impl Circle {
+    fn new(point: Point, radius: i32) -> Self {
+        Self{
+            point,
+            radius
+        }
+    }
 
-        Line::new(rb_point.clone(), lt_point.clone()).draw(image);
-        // Line::new(lb_point.clone(), rb_point.clone()).draw(image);
-        // Line::new(lb_point.clone(), lt_point.clone()).draw(image);
-        Line::new(lt_point.clone(), rt_point.clone()).draw(image);
+    pub fn random(width: i32, height: i32) -> Self {
+        let x = rand::thread_rng().gen_range(0..=width);
+        let y = rand::thread_rng().gen_range(0..=height);
+        let radius = rand::thread_rng().gen_range(1..=(width+height)/2);
+
+        Circle::new(Point::new(x, y), radius)
+    }
+}
+
+impl Drawable for Circle {
+    fn draw(&self, image: &mut Image) {
+        let center_x = self.point.0;
+        let center_y = self.point.1;
+        let radius = self.radius;
+        let color = self.color();
+        
+        let num_points = (radius * 8).max(360);
+
+        for i in 0..num_points {
+            let angle = (i as f64) * 2.0 * std::f64::consts::PI / (num_points as f64);
+            
+            // Calculate point on circle
+            let x = (center_x as f64 + radius as f64 * angle.cos()).round() as i32;
+            let y = (center_y as f64 + radius as f64 * angle.sin()).round() as i32;
+            
+            image.display(x, y, color.clone());
+        }
     }
 }
